@@ -20,7 +20,7 @@
         <Button @click="showWordsDetail(index)" class="word" type="primary" size="large">{{item.word}}</Button>
 
         <div v-show="holdWords[index].detailFlag" class="detailSturc">
-          <div class="sentence text">{{item.sentence}}</div>
+          <div class="sentence text"><span v-html="item.sentence"></span></div>
           <div class="voice text">{{item.voice}}</div>
           <div class="chinese text">{{item.chinese}}</div>
         </div>
@@ -52,6 +52,23 @@ export default {
       this.$router.push({
         name: "index"
       })
+    },
+        stringMatch(){  //复习的单词加粗显示
+      for(let i=0;i<this.holdWords.length;i++){
+        let sentenceHtml=this.holdWords[i].sentence;
+        let word=this.holdWords[i].word;
+        word=word.replace(/\s+/g,""); 
+        let reg =new RegExp(word,'i',);
+        let sentenceAfter=sentenceHtml.replace(reg,`<b>${word}</b>`); //单词左右加上<b></b>
+        sentenceAfter=sentenceAfter.replace(/<\/b>s/,`s</b>`); //单词结尾是s，左右加上<b></b>
+        sentenceAfter=sentenceAfter.replace(/<\/b>es/,`es</b>`); //单词结尾是es，左右加上<b></b>
+        console.log(sentenceAfter)
+        if(sentenceAfter.indexOf(word)==3){//如果单词在第一个，首字母改成大写
+          sentenceAfter=sentenceAfter.substring(0,3)+sentenceAfter.substring(3,4).toUpperCase()+sentenceAfter.substring(4);
+        }
+        this.holdWords[i].sentence=sentenceAfter;
+        this.holdWords[i].word=word; 
+      }
     }
   },
 
@@ -60,6 +77,7 @@ export default {
     for (let i = 0; i < this.holdWords.length; i++) {
       this.holdWords[i].detailFlag = false;
     }
+    this.stringMatch()
   },
 };
 </script>
